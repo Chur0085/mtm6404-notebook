@@ -8,7 +8,7 @@
         <button class="btn btn-secondary" @click="showForm = true">&plus;</button>
       </div>
     </div>
-    <router-view/>
+    <router-view :key="$router.fullPath"/>
     <transition enter-active-class="animate__animated animate__bounceIn">
       <div class="modal" v-show="showForm">
         <div class="modal-dialog">
@@ -26,11 +26,15 @@
                   <label class="form-label">Text</label>
                   <textarea v-model="text" class="form-control"></textarea>
                 </div>
+                <div class="mb-3">
+                  <label class="form-label">First Name</label>
+                  <textarea v-model="text" class="form-control"></textarea>
+                </div>
               </form>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="cancelNote">Cancel</button>
-              <button type="button" class="btn btn-primary" @click="addNote">Save</button>
+              <button type="button" class="btn btn-secondary" @click="cancelContact">Cancel</button>
+              <button type="button" class="btn btn-primary" @click="addContact">Save</button>
             </div>
           </div>
         </div>
@@ -40,19 +44,28 @@
 </template>
 
 <script>
+import db from './db.js'
 export default {
   data: function () {
     return {
       showForm: false,
       title: '',
-      text: ''
+      text: '',
+      firstname: ''
     }
   },
   methods: {
-    addNote: function () {
-      
+    addContact: function () {
+      db.collection('Contacts').add({
+        title: this.title,
+        text: this.text,
+        firstname: this.firstname
+      }).then(doc => {
+        this.cancelContact()
+        this.$router.push('/note/' + doc.id)
+      })
     },
-    cancelNote: function () {
+    cancelContact: function () {
       this.showForm = false
       this.title = ''
       this.text = ''
